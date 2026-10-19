@@ -596,6 +596,22 @@ def convert_rrs_to_beta_tri(rr_low,rr_mid,rr_high,interval,increment):
 
 # Library of ERFs
 erf_lib = {}
+
+# Malashock et. al 2022 [Derived from a meta-regression of 5 cohorts]
+rr = (1.03, 1.06, 1.10)  # per 10 ppb
+beta_025, beta_mean, beta_975 = np.log(rr) / 10.0
+beta_low, beta_high, h = mcstats.iter_tri_bounds(beta_025, beta_mean, beta_975, 95)
+erf_lib['malashock_2022_RD'] = meta_erf(
+    erf=log_linear_erf(beta=np.nan, chi_min=0.0),
+    disease_name='Respiratory disease',
+    disease_data=turner_diseases['Respiratory disease'],
+    exposure_factor='O3_MDA8_ANN',
+    name='Malashock 2022 respiratory',
+    min_age=30,
+    max_age=np.inf,
+    param_gen=[mcstats.tri_var(low=beta_low, mid=beta_mean, high=beta_high)]
+)
+
 # Chen and Hoek 2020, all-cause
 rr = (1.06,1.08,1.09)
 beta_025, beta_mean, beta_975 = np.log(rr)/10.0

@@ -7,9 +7,13 @@ from gcgridobj import cstools
 # gpw_dir:      directory must contain the GPW 4.11 population grids
 # who_dir:      directory must contain the GHE2016 CSVs
 # mort_preproc: directory must contain GPW_to_WHO.pkl and (if GEMM used) gemm_crf.csv
-gpw_dir  = '/rds/general/user/seastham/home/GPWv4/GPWv4pt11'
-who_dir  = '/rds/general/user/seastham/home/health_data/WHO_Data'
-mort_preproc = '/rds/general/user/seastham/home/health_data/mort_preproc'
+# Paths are configurable via environment variables so this works across clusters.
+HEALTH_ROOT = os.environ.get('AQHEALTH_HEALTH_ROOT', os.path.expanduser('~/HEALTH'))
+DATA_ROOT = os.environ.get('AQHEALTH_DATA_ROOT', '/net/d16/data/shreya22')
+
+gpw_dir  = os.path.join(HEALTH_ROOT, 'GPW/gpw-v4-population-density-adjusted-to-2015-unwpp-country-totals-rev11_totpop_2pt5_min_nc')
+who_dir  = os.path.join(HEALTH_ROOT, 'Mortality_Files/LM_EXB_HealthDemo/WHO_Data')
+mort_preproc = os.path.join(HEALTH_ROOT, 'Mortality_Files/LM_EXB_HealthDemo/Preprocessed_Mort_Data')
 gemm_csv = os.path.join(mort_preproc,'gemm_crf.csv')
 who_by_country = os.path.join(who_dir,'GHE2016_Deaths_2016-country.xls')
 who_by_region  = os.path.join(who_dir,'GHE2016_Deaths_WHOReg_2000_2016.xls')
