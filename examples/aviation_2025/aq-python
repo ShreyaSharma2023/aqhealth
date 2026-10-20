@@ -1,0 +1,8 @@
+#!/bin/bash
+# Run Python in the health-calculation environment: the venv in Health/venv-aqhealth, which sits on the conda
+# environment gchp_regrid (esmpy/xesmf/gcpy/numpy). Conda sets these variables on `conda activate`; a venv python
+# started directly does not, and esmpy and pyproj fail without them. Usage: aq-python script.py [args]
+E=${AQ_CONDA_ENV:-/net/fs12/d1/shreya22/envs/gchp_regrid}
+V=${AQ_VENV:-/net/fs12/d1/shreya22/Health/venv-aqhealth}
+export ESMFMKFILE=$E/lib/esmf.mk PROJ_DATA=$E/share/proj PROJ_LIB=$E/share/proj
+exec "$V/bin/python" "$@"
