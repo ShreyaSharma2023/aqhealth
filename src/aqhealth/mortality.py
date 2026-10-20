@@ -909,7 +909,8 @@ def run_sim_batch(ERF_set, country_names, who_age_ceilings, pop_grid_2d, cid_gri
 
     # Use this to avoid non-calculations
     pop_ok = np.logical_and(pop_grid_2d > 0,cid_grid_2d < 10000)
-    n_ok = np.count_nonzero(pop_ok)
+    # A Python int: multiprocessing.RawArray rejects numpy integers (Python >= 3.12)
+    n_ok = int(np.count_nonzero(pop_ok))
 
     pop_grid_dbl = pop_grid_2d[pop_ok].astype(np.double)
     pop_grid_dbl_R = multiprocessing.RawArray('d',pop_grid_dbl.size)
