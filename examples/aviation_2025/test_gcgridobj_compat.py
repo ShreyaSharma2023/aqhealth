@@ -51,3 +51,35 @@ def test_areas_add_up_to_the_sphere():
     grid = cstools.gen_grid(90)
     sphere = 4.0 * np.pi * 6.371e6**2
     assert float(grid['area'].sum()) == pytest.approx(sphere, rel=2e-3)
+
+
+class FakeFaceRegridder:
+    """What xesmf >= 0.9 gives for one cube face -> lat-lon: a callable with shape_out = (n_lat, n_lon) and no
+    grid_out / _grid_out. It puts the face's sum into every output cell."""
+
+    shape_in = (3, 3)
+    shape_out = (4, 8)
+
+    def __call__(self, face):
+        assert face.shape == (3, 3)
+        return np.full(self.shape_out, float(face.sum()))
+
+
+def test_cubed_sphere_to_latlon_works_with_the_regridder_objects_of_xesmf_0_9():
+    from gcgridobj import regrid
+
+    faces = [FakeFaceRegridder() for _ in range(6)]
+    data = np.arange(6 * 3 * 3, dtype=float).reshape(6, 3, 3)
+    out = regrid.regrid(data, faces)
+    assert out.shape == (4, 8)  # (n_lat, n_lon), not transposed
+    np.testing.assert_allclose(out, data.sum())  # the six faces are added
+
+
+def test_cubed_sphere_to_latlon_keeps_leading_dimensions():
+    from gcgridobj import regrid
+
+    faces = [FakeFaceRegridder() for _ in range(6)]
+    data = np.ones((2, 5, 6, 3, 3))
+    out = regrid.regrid(data, faces)
+    assert out.shape == (2, 5, 4, 8)
+    np.testing.assert_allclose(out, 6 * 9.0)
