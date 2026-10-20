@@ -499,7 +499,8 @@ def read_who_data(who_by_country_xls=None,who_by_region_xls=None,as_rates=False)
             if reg not in who_data[out_col].columns:
                 who_data[out_col][reg] = 0.0
             for suffix in ['','.1']:
-                temp_vec = who_xls[in_col + suffix].values
+                # .copy(): with pandas >= 2 the column's values are read-only, and we scale them in place
+                temp_vec = who_xls[in_col + suffix].values.copy()
                 # Make everything in terms of thousands
                 temp_vec[1:] *= 0.001
                 who_data[out_col][reg] += temp_vec
@@ -513,7 +514,7 @@ def read_who_data(who_by_country_xls=None,who_by_region_xls=None,as_rates=False)
                 temp_data = np.asarray(col).astype(np.int32)
                 who_data[age_range][loc] = temp_data.copy()
             if as_rates and (loc not in ['Sex','GHE Code']):
-                temp_data = np.asarray(col)
+                temp_data = np.array(col, dtype=float)  # a copy: it is divided in place
                 temp_data[1:] /= temp_data[0]
                 who_data[age_range][loc] = temp_data.copy()
 
